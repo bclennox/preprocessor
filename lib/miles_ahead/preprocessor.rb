@@ -59,7 +59,7 @@ module MilesAhead
         re = /:(["'|])(.*?)(\1)/
         string_refs = []
         while options_string.match(re)
-          options_string.sub!(re, ":ppstringref#{string_refs.count}")
+          options_string.sub!(re, ":ppstringref#{string_refs.length}")
           string_refs.push($2)
         end
         
