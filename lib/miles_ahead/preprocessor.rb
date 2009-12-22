@@ -43,10 +43,10 @@ module MilesAhead
     private
 
       def replacement_for(message, options_string)
-        if delegate.respond_to?(message)
-          delegate.send(message)
-        elsif respond_to?(message)
+        if respond_to?(message)
           send(message, options_from_string(options_string))
+        elsif delegate.respond_to?(message)
+          delegate.send(message)
         else
           "{-{-#{message}-}-}"
         end

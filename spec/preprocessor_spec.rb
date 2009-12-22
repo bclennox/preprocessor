@@ -12,14 +12,19 @@ class PreprocessorTester
 end
 
 describe MilesAhead::Preprocessor do
-  it 'should return the unchanged string if neither it nor the delegate responds_to?' do
-    tester = PreprocessorTester.new(:text => "I don't understand {{anything}}")
-    tester.preprocessed.text.should == "I don't understand {{anything}}"
-  end
-  
   it 'should substitute method return values if the delegate responds_to?' do
     tester = PreprocessorTester.new(:name => 'Fooject', :title => 'This is the {{name}}')
     tester.preprocessed.title.should == 'This is the Fooject'
+  end
+  
+  it 'should prioritize sub-module methods over delegate methods' do
+    tester = PreprocessorTester.new(:image => 'paperclip', :text => 'Look! My new Zune: {{image src:shit-brown.png}}')
+    tester.preprocessed.text.should_not =~ /paperclip/
+  end
+  
+  it 'should return the unchanged string if neither it nor the delegate responds_to?' do
+    tester = PreprocessorTester.new(:text => "I don't understand {{anything}}")
+    tester.preprocessed.text.should == "I don't understand {{anything}}"
   end
   
   describe "parsing option strings" do
