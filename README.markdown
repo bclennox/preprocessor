@@ -31,14 +31,26 @@ Option values may be unquoted, single-quoted, double-quoted, or pipe-quoted. Quo
 
     {{footnote ref:1 text:|So I said, "Don't shoot the messenger HAHAHLOLOL"|}}
 
+### Footnotes
+
+I like to use footnotes, but they're a pain in the ass to manage. Simple footnotes were my main motivation in creating this module.
+
+    {{footnote ref:1 text:"Disclaimer: Although I made this statement, it may not be true."}}
+    {{footnote ref:2 text:"Full disclosure: I own stock in buntaluffigus skins."}}
+    {{footnotes}}
+
+Create footnote references using the `{{footnote}}` tag. Create the list of footnotes at the end of your document via the `{{footnotes}}` tag (it's an HTML ordered list).
+
+See [one of my articles with footnotes](http://bclennox.com/moving-to-html-5) if you're interested in the markup.
+
 ### Images
 
 Creates an HTML paragraph and image and optional caption:
 
     {{image src:jade-plant.png alt:"My beautiful jade plant" title:alt caption:title}}
-    
-    # becomes
-    
+
+becomes:
+
     <p class="image"><img ... /><span class="caption">...</span></p>
 
 Options:
@@ -53,9 +65,9 @@ Options:
 Creates an HTML 5 `<audio>` element with Ogg and MP3 sources:
 
     {{audio src:funky-jam}}
-    
-    # becomes
-    
+
+becomes:
+
     <audio controls><source src="/audio/funky-jam.oga" type="audio/ogg" /><source src="/audio/funky-jam.mp3" type="audio/mpeg" /></audio>
 
 You can set the default path for non-absolute paths via `MilesAhead::Preprocessor::Audio.options[:default_path]`.
@@ -65,9 +77,9 @@ You can set the default path for non-absolute paths via `MilesAhead::Preprocesso
 Creates an HTML 5 `<video>` element with Ogg and MP4 sources:
     
     {{video src:kitty-in-the-window poster:/images/kitty-in-the-window.png}}
-    
-    # becomes
-    
+
+becomes:
+
     <video controls poster="/images/kitty-in-the-window.png"><source src="/video/kitty-in-the-window.ogv" type="video/ogg" /><source src="/video/kitty-in-the-window.mp4" type="video/mp4" /></video>
 
 You can set the default path for non-absolute paths via `MilesAhead::Preprocessor::Video.options[:default_path]`.
@@ -75,16 +87,6 @@ You can set the default path for non-absolute paths via `MilesAhead::Preprocesso
 Also handles embedding YouTube videos via a URL:
 
     {{video src:"http://www.youtube.com/watch?v=jHyC0ggI3Ow"}}
-
-### Footnotes
-
-I like to use footnotes, but they're a pain in the ass to manage. Simple footnotes were my main motivation in creating this module.
-
-    {{footnote ref:1 text:"Disclaimer: Although I made this statement, it may not be true."}}
-    {{footnote ref:2 text:"Full disclosure: I own stock in buntaluffigus skins."}}
-    {{footnotes}}
-
-Create footnote references using the `{{footnote}}` tag. Create the list of footnotes at the end of your document via the `{{footnotes}}` tag (it's an HTML ordered list).
 
 Todo
 ====
