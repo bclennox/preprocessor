@@ -6,7 +6,7 @@ module MilesAhead
       end
       
       def absolute?(src)
-        src[0, 1] == '/'
+        src =~ /^\/|http:\/\//
       end
     end
   end

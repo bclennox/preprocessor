@@ -1,7 +1,8 @@
 require 'miles_ahead/preprocessor/utilities'
-require 'miles_ahead/preprocessor/audio'
-require 'miles_ahead/preprocessor/footnote'
 require 'miles_ahead/preprocessor/image'
+require 'miles_ahead/preprocessor/audio'
+require 'miles_ahead/preprocessor/video'
+require 'miles_ahead/preprocessor/footnote'
 
 module MilesAhead
   module Preprocessor
@@ -18,9 +19,10 @@ module MilesAhead
     attr_accessor :delegate
     
     include MilesAhead::Preprocessor::Utilities
-    include MilesAhead::Preprocessor::Audio
-    include MilesAhead::Preprocessor::Footnote
     include MilesAhead::Preprocessor::Image
+    include MilesAhead::Preprocessor::Audio
+    include MilesAhead::Preprocessor::Video
+    include MilesAhead::Preprocessor::Footnote
     
     TAG_REGEX = /\{\{(\S+?)(?:\s+(.*?))?\}\}/
     REPLACEMENT_REGEX = /\{-\{-(.*?)-\}-\}/
@@ -64,7 +66,7 @@ module MilesAhead
         end
         
         options_string.split(/\s+/).inject({}) do |memo, o|
-          q = o.split(/:/)
+          q = o.split(/:/, 2)
           memo[q.first.to_sym] = q.last.match(/ppstringref(\d+)/) ? string_refs[$1.to_i] : q.last
           memo
         end

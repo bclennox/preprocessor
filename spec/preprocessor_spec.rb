@@ -51,6 +51,46 @@ describe MilesAhead::Preprocessor do
     it 'should parse piped option values' do
       options_from_string(%{arg:|And I said, "Frankly, my dear, I don't give a damn!"|}).should == { :arg => %{And I said, "Frankly, my dear, I don't give a damn!"} }
     end
+    
+    it 'should parse option values with special characters' do
+      options_from_string(%{arg:http://www.example.com/}).should == { :arg => 'http://www.example.com/' }
+    end
+  end
+  
+  describe "utilities" do
+    class UtilitiesTester
+      include MilesAhead::Preprocessor::Utilities
+    end
+    
+    it 'should ignore absolute paths' do
+      UtilitiesTester.new.absolutize('/my/stuff/me.png', '/where/ever').should == '/my/stuff/me.png'
+    end
+    
+    it 'should not prepend the default path to URLs' do
+      UtilitiesTester.new.absolutize('http://example.com/illicit.png', '/lalala').should == 'http://example.com/illicit.png'
+    end
+  end
+  
+  describe "#image" do
+    it 'should have src, alt, title attributes and a caption' do
+      tester = PreprocessorTester.new(:text => 'This chick is mad hot: {{image src:chick.png alt:"Chicken in the oven" title:"No title necessary" caption:"Look how hot yah"}}')
+      tester.preprocessed.text.should =~ /src="\/images\/chick.png"/
+      tester.preprocessed.text.should =~ /alt="Baby chicken"/
+      tester.preprocessed.text.should =~ /title="No title necessary"/
+      tester.preprocessed.text.should =~ /Look how hot yah/
+    end
+    
+    it 'should allow shortcutting title and caption' do
+      tester = PreprocessorTester.new(:text => 'Lazy {{image src:foo.png alt:"Required" title:alt caption:title}}')
+      tester.preprocessed.text.should =~ /title="Required"/
+      tester.preprocessed.text.should =~ /<span class="caption">Required<\/span>/
+    end
+    
+    it 'should set the default path' do
+      MilesAhead::Preprocessor::Image.options[:default_path] = '/system/assets'
+      tester = PreprocessorTester.new(:text => 'Hope it works: {{image src:boo.png alt:"Whatevs"}}')
+      tester.preprocessed.text.should =~ /src="\/system\/assets\/boo.png"/
+    end
   end
   
   describe "#audio" do
@@ -58,12 +98,12 @@ describe MilesAhead::Preprocessor do
       @tester = PreprocessorTester.new(:text => 'Peep this sweet cut: {{audio src:piano-rock}}')
     end
     
-    it 'should contain a source for the .mp3 file' do
+    it 'should contain a source for the MP3 file' do
       @tester.preprocessed.text.should =~ /piano-rock.mp3/
     end
     
-    it 'should contain a source for the .ogg file' do
-      @tester.preprocessed.text.should =~ /piano-rock.ogg/
+    it 'should contain a source for the Ogg file' do
+      @tester.preprocessed.text.should =~ /piano-rock.oga/
     end
     
     it 'should set the default path' do
@@ -74,6 +114,41 @@ describe MilesAhead::Preprocessor do
     it 'should not prepend the default path to absolute paths' do
       tester = PreprocessorTester.new(:text => 'Baddies: {{audio src:/i/love/bob}}')
       tester.preprocessed.text.should =~ /\/i\/love\/bob/
+    end
+  end
+  
+  describe "#video" do
+    describe 'YouTube videos' do
+      it 'should recognize a "watch" URL with a query string' do
+        MilesAhead::Preprocessor::Video::YouTube.should recognize('http://www.youtube.com/watch?v=jHyC0ggI3Ow&feature=player_embedded')
+      end
+      
+      it 'should recognize a "/v/" URL with a query string' do
+        MilesAhead::Preprocessor::Video::YouTube.should recognize('http://www.youtube.com/v/jHyC0ggI3Ow&hl=en_US&fs=1&rel=0')
+      end
+      
+      it 'should include the object and embed shit' do
+        tester = PreprocessorTester.new(:text => 'LOLOL {{video src:"http://www.youtube.com/watch?v=jHyC0ggI3Ow"}}')
+        tester.preprocessed.text.should =~ /param name="movie" value="http:\/\/www.youtube.com\/v\/jHyC0ggI3Ow"/
+        tester.preprocessed.text.should =~ /embed src="http:\/\/www.youtube.com\/v\/jHyC0ggI3Ow"/
+      end
+    end
+    
+    describe "HTML 5 videos" do
+      it 'should include the MP4 source' do
+        tester = PreprocessorTester.new(:text => 'Made this today {{video src:/videos/dancedancedance}}')
+        tester.preprocessed.text.should =~ /dancedancedance.mp4/
+      end
+
+      it 'should include the Ogg source' do
+        tester = PreprocessorTester.new(:text => 'Loooook {{video src:/videos/ooouuuuttttt}}')
+        tester.preprocessed.text.should =~ /ooouuuuttttt.ogv/
+      end
+      
+      it 'should include an optional poster' do
+        tester = PreprocessorTester.new(:text => 'Snore {{video src:/videos/help poster:/images/posse.png}}')
+        tester.preprocessed.text.should =~ /poster="\/images\/posse.png"/
+      end
     end
   end
   
@@ -96,33 +171,6 @@ describe MilesAhead::Preprocessor do
     it 'should not explode if {{footnotes}} is called without any footnotes' do
       tester = PreprocessorTester.new(:text => 'There are no {{footnotes}}.')
       tester.preprocessed.text.should == 'There are no .'
-    end
-  end
-  
-  describe "#image" do
-    it 'should have src, alt, title attributes and a caption' do
-      tester = PreprocessorTester.new(:text => 'This chick is mad hot: {{image src:chick.png alt:"Baby chicken" title:"No title necessary" caption:"Look how hot yah"}}')
-      tester.preprocessed.text.should =~ /src="\/images\/chick.png"/
-      tester.preprocessed.text.should =~ /alt="Baby chicken"/
-      tester.preprocessed.text.should =~ /title="No title necessary"/
-      tester.preprocessed.text.should =~ /Look how hot yah/
-    end
-    
-    it 'should allow shortcutting title and caption' do
-      tester = PreprocessorTester.new(:text => 'Lazy {{image src:foo.png alt:"Required" title:alt caption:title}}')
-      tester.preprocessed.text.should =~ /title="Required"/
-      tester.preprocessed.text.should =~ /<span class="caption">Required<\/span>/
-    end
-    
-    it 'should set the default path' do
-      MilesAhead::Preprocessor::Image.options[:default_path] = '/system/assets'
-      tester = PreprocessorTester.new(:text => 'Hope it works: {{image src:boo.png alt:"Whatevs"}}')
-      tester.preprocessed.text.should =~ /src="\/system\/assets\/boo.png"/
-    end
-    
-    it 'should not prepend the default path to absolute paths' do
-      tester = PreprocessorTester.new(:text => 'NO TOUCH: {{image src:/my/stuff/me.png alt:"Holla holla holla"}}')
-      tester.preprocessed.text.should =~ /src="\/my\/stuff\/me.png"/
     end
   end
 end

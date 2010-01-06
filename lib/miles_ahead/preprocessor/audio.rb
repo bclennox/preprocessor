@@ -9,7 +9,7 @@ module MilesAhead
       
       def audio(options)
         src = absolutize(options[:src], MilesAhead::Preprocessor::Audio.options[:default_path])
-        %{<audio controls="controls"><source src="#{src}.ogg" /><source src="#{src}.mp3" /></audio>}
+        %{<audio controls><source src="#{src}.oga" type="audio/ogg" /><source src="#{src}.mp3" type="audio/mpeg" /></audio>}
       end
     end
   end
