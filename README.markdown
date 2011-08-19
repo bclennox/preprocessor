@@ -13,11 +13,11 @@ By including the Preprocessor module, your class will have a `preprocessed` meth
       include MilesAhead::Preprocessor
     end
     
-    a = Article.new
-    a.body = 'Have some {{audio src:/files/audio/fun}}'
+    a = Article.new(:title => 'Here')
+    a.body = '{{title}}: Have some {{audio src:/files/audio/fun}}'
     
-    a.body              #=> 'Have some {{audio src:/files/audio/fun}}'
-    a.preprocessed.body #=> 'Have some <audio controls><source ... /></audio>'
+    a.body              #=> '{{title}}: Have some {{audio src:/files/audio/fun}}'
+    a.preprocessed.body #=> 'Here: Have some <audio controls><source ... /></audio>'
 
 Tags
 ----

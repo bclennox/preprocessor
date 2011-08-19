@@ -24,7 +24,7 @@ module MilesAhead
     include MilesAhead::Preprocessor::Video
     include MilesAhead::Preprocessor::Footnote
     
-    TAG_REGEX = /\{\{(\S+?)(?:\s+(.*?))?\}\}/
+    TAG_REGEX = /(.)?\{\{(\S+?)(?:\s+(.*?))?\}\}/
     REPLACEMENT_REGEX = /\{-\{-(.*?)-\}-\}/
 
     def initialize(delegate)
@@ -35,7 +35,7 @@ module MilesAhead
       text = delegate.send(sym, *args)
       
       while text.match(TAG_REGEX)
-        text.sub!(TAG_REGEX, replacement_for($1, $2))
+        text.sub!(TAG_REGEX, replacement_for($2, $3, $1))
       end
       
       text.gsub!(REPLACEMENT_REGEX, '{{\1}}')
@@ -44,14 +44,29 @@ module MilesAhead
 
     private
 
-      def replacement_for(message, options_string)
-        if respond_to?(message)
-          send(message, options_from_string(options_string))
-        elsif delegate.respond_to?(message)
-          delegate.send(message)
+      def replacement_for(message, options_string, antecedant = '')
+        if escape?(antecedant)
+          antecedant = ''
+          replacement = replacement_placeholder(message, options_string)
         else
-          "{-{-#{message}-}-}"
+          replacement = if respond_to?(message)
+            send(message, options_from_string(options_string))
+          elsif delegate.respond_to?(message)
+            delegate.send(message)
+          else
+            replacement_placeholder(message, options_string)
+          end
         end
+        
+        antecedant + replacement
+      end
+      
+      def replacement_placeholder(text, options)
+        "{-{-#{[text, options].compact.join(' ')}-}-}"
+      end
+      
+      def escape?(char)
+        char == '\\'
       end
       
       def options_from_string(options_string)

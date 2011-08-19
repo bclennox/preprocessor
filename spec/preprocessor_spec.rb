@@ -12,6 +12,11 @@ class PreprocessorTester
 end
 
 describe MilesAhead::Preprocessor do
+  it 'should ignore escaped curlies' do
+    tester = PreprocessorTester.new(:name => 'Munge', :title => 'Remember my \{{name with:"a mnemonic"}}')
+    tester.preprocessed.title.should == 'Remember my {{name with:"a mnemonic"}}'
+  end
+  
   it 'should substitute method return values if the delegate responds_to?' do
     tester = PreprocessorTester.new(:name => 'Fooject', :title => 'This is the {{name}}')
     tester.preprocessed.title.should == 'This is the Fooject'
@@ -75,7 +80,7 @@ describe MilesAhead::Preprocessor do
     it 'should have src, alt, title attributes and a caption' do
       tester = PreprocessorTester.new(:text => 'This chick is mad hot: {{image src:chick.png alt:"Chicken in the oven" title:"No title necessary" caption:"Look how hot yah"}}')
       tester.preprocessed.text.should =~ /src="\/images\/chick.png"/
-      tester.preprocessed.text.should =~ /alt="Baby chicken"/
+      tester.preprocessed.text.should =~ /alt="Chicken in the oven"/
       tester.preprocessed.text.should =~ /title="No title necessary"/
       tester.preprocessed.text.should =~ /Look how hot yah/
     end
