@@ -141,17 +141,17 @@ describe MilesAhead::Preprocessor do
     
     describe "HTML 5 videos" do
       it 'should include the MP4 source' do
-        tester = PreprocessorTester.new(:text => 'Made this today {{video src:/videos/dancedancedance}}')
+        tester = PreprocessorTester.new(:text => '{{video src:/videos/dancedancedance}}')
         tester.preprocessed.text.should =~ /dancedancedance.mp4/
       end
 
       it 'should include the Ogg source' do
-        tester = PreprocessorTester.new(:text => 'Loooook {{video src:/videos/ooouuuuttttt}}')
+        tester = PreprocessorTester.new(:text => '{{video src:/videos/ooouuuuttttt}}')
         tester.preprocessed.text.should =~ /ooouuuuttttt.ogv/
       end
       
       it 'should include an optional poster' do
-        tester = PreprocessorTester.new(:text => 'Snore {{video src:/videos/help poster:/images/posse.png}}')
+        tester = PreprocessorTester.new(:text => '{{video src:/videos/help poster:/images/posse.png}}')
         tester.preprocessed.text.should =~ /poster="\/images\/posse.png"/
       end
     end

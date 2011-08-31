@@ -35,7 +35,7 @@ module MilesAhead
       text = delegate.send(sym, *args)
       
       while text.match(TAG_REGEX)
-        text.sub!(TAG_REGEX, replacement_for($2, $3, $1))
+        text.sub!(TAG_REGEX, replacement_for($2, $3, $1 || ''))
       end
       
       text.gsub!(REPLACEMENT_REGEX, '{{\1}}')
@@ -44,7 +44,7 @@ module MilesAhead
 
     private
 
-      def replacement_for(message, options_string, antecedant = '')
+      def replacement_for(message, options_string, antecedant)
         if escape?(antecedant)
           antecedant = ''
           replacement = replacement_placeholder(message, options_string)
