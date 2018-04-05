@@ -5,7 +5,7 @@ module Preprocessor
     end
 
     def absolute?(src)
-      src =~ /^\/|http:\/\//
+      src =~ /^\/|https?:\/\//
     end
   end
 end
