@@ -16,7 +16,7 @@ module Preprocessor
 
       def tag
         if src =~ URL_REGEXP
-          url = "http://www.youtube.com/v/#{$1}"
+          url = "https://www.youtube.com/v/#{$1}"
           %{<object width="425" height="344"><param name="movie" value="#{url}"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="#{url}" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="344"></embed></object>}
         end
       end
