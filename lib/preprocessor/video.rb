@@ -7,17 +7,18 @@ module Preprocessor
     @options = { :default_path => '/video' }
 
     class YouTube
-      attr_accessor :src
+      attr_accessor :src, :width, :height
       URL_REGEXP = /youtube\.com\/(?:watch\?v=|v\/)([^\/?&]+)/i
 
       def initialize(options)
         self.src = options[:src]
+        self.width = options[:width] || 465
+        self.height = options[:height] || 344
       end
 
       def tag
         if src =~ URL_REGEXP
-          url = "https://www.youtube.com/v/#{$1}"
-          %{<object width="425" height="344"><param name="movie" value="#{url}"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="#{url}" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="344"></embed></object>}
+          %{<iframe width="#{width}" height="#{height}" src="https://www.youtube-nocookie.com/embed/#{$1}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>}
         end
       end
 
